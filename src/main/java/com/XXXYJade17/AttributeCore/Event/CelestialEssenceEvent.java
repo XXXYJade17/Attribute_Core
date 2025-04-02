@@ -54,9 +54,12 @@ public class CelestialEssenceEvent {
     public static void onPlayerJoin(EntityJoinLevelEvent event) {
         if (!event.getLevel().isClientSide()) {
             if (event.getEntity() instanceof ServerPlayer player) {
+
                 Optional<CelestialEssence> optionalPlayerXp =
                         Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
                 optionalPlayerXp.ifPresent(CE -> {
+                    CompoundTag playerData = player.getPersistentData();
+                    CE.loadData(playerData);
                     PacketDistributor.PLAYER.with(player)
                             .send(new CelestialEssenceData(CE.getCultivationRealm(), CE.getStageRank(), CE.getEtherealEssence()));
                     LOGGER.info("Player's Ethereal Essence data has been loaded. Ethereal Essence: {}", CE.getEtherealEssence());
