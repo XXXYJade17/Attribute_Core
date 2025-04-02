@@ -29,37 +29,42 @@ public class CelestialEssenceEvent {
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.player instanceof ServerPlayer player) {
-            Optional<CelestialEssence> optionalPlayerXp =
-                    Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
-            optionalPlayerXp.ifPresent(CE -> {
-                int tickCounter = tickCounters.getOrDefault(player, 0);
-                if (++tickCounter >= TICKS_PER_MINUTE) {
-                    tickCounters.put(player, 0);
-                    CE.setEtherealEssence(CE.getEtherealEssence()+1);
-                    PacketDistributor.PLAYER.with(player)
-                            .send(new CelestialEssenceData(CE.getCultivationRealm(),CE.getStageRank(),CE.getEtherealEssence()));
-                    player.sendSystemMessage(Component.literal("当前EE:" + CE.getEtherealEssence()));
-                }else{
-                    tickCounters.put(player, tickCounter);
-                }
-            });
+        if(event.side == LogicalSide.SERVER) {
+            if (event.player instanceof ServerPlayer player) {
+                Optional<CelestialEssence> optionalPlayerXp =
+                        Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
+                optionalPlayerXp.ifPresent(CE -> {
+                    int tickCounter = tickCounters.getOrDefault(player, 0)+1;
+                    if (tickCounter >= TICKS_PER_MINUTE) {
+                        tickCounters.put(player, 0);
+                        CE.setEtherealEssence(CE.getEtherealEssence() + 1);
+                        PacketDistributor.PLAYER.with(player)
+                                .send(new CelestialEssenceData(CE.getCultivationRealm(), CE.getStageRank(), CE.getEtherealEssence()));
+                        player.sendSystemMessage(Component.literal("当前EE:" + CE.getEtherealEssence()));
+                    } else {
+                        tickCounters.put(player, tickCounter);
+                    }
+                });
+            }
         }
     }
 
     @SubscribeEvent
     public static void onPlayerJoin(EntityJoinLevelEvent event) {
         if(!event.getLevel().isClientSide()) {
-            if (event.getEntity() instanceof ServerPlayer player) {
-                Optional<CelestialEssence> optionalPlayerXp =
-                        Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
-                optionalPlayerXp.ifPresent(CE -> {
-                    CompoundTag playerData = new CompoundTag();
-                    CE.loadData(playerData);
-                    if (playerData.contains("ethereal_essence")) {
-                        CompoundTag etherealEssence = playerData.getCompound("ethereal_essence");
-                        LOGGER.info("Player {}'s Ethereal Essence data has been loaded. Ethereal Essence: {}",etherealEssence);
-                    }});
+            if (!event.getLevel().isClientSide()) {
+                if (event.getEntity() instanceof ServerPlayer player) {
+                    Optional<CelestialEssence> optionalPlayerXp =
+                            Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
+                    optionalPlayerXp.ifPresent(CE -> {
+                        CompoundTag playerData = player.getPersistentData();
+                        CE.loadData(playerData);
+                        if (playerData.contains("ethereal_essence")) {
+                            CompoundTag etherealEssence = playerData.getCompound("ethereal_essence");
+                            LOGGER.info("Player {}'s Ethereal Essence data has been loaded. Ethereal Essence: {}", etherealEssence);
+                        }
+                    });
+                }
             }
         }
     }
