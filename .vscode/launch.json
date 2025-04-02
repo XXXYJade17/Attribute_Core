@@ -1,0 +1,101 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "Client",
+      "presentation": {
+        "group": "Mod Development - Attribute Core",
+        "order": 0
+      },
+      "projectName": "Attribute Core",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@D:\\yckin.000\\桌面\\Attribute Core\\build\\moddev\\clientRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@D:\\yckin.000\\桌面\\Attribute Core\\build\\moddev\\clientRunVmArgs.txt",
+        "-Dfml.modFolders\u003dattributecore%%D:\\yckin.000\\桌面\\Attribute Core\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\run",
+      "env": {
+        "MOD_CLASSES": "attributecore%%D:\\yckin.000\\桌面\\Attribute Core\\bin\\main"
+      },
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    },
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "Data",
+      "presentation": {
+        "group": "Mod Development - Attribute Core",
+        "order": 1
+      },
+      "projectName": "Attribute Core",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@D:\\yckin.000\\桌面\\Attribute Core\\build\\moddev\\dataRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@D:\\yckin.000\\桌面\\Attribute Core\\build\\moddev\\dataRunVmArgs.txt",
+        "-Dfml.modFolders\u003dattributecore%%D:\\yckin.000\\桌面\\Attribute Core\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\run",
+      "env": {
+        "MOD_CLASSES": "attributecore%%D:\\yckin.000\\桌面\\Attribute Core\\bin\\main"
+      },
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    },
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "GameTestServer",
+      "presentation": {
+        "group": "Mod Development - Attribute Core",
+        "order": 2
+      },
+      "projectName": "Attribute Core",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@D:\\yckin.000\\桌面\\Attribute Core\\build\\moddev\\gameTestServerRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@D:\\yckin.000\\桌面\\Attribute Core\\build\\moddev\\gameTestServerRunVmArgs.txt",
+        "-Dfml.modFolders\u003dattributecore%%D:\\yckin.000\\桌面\\Attribute Core\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\run",
+      "env": {
+        "MOD_CLASSES": "attributecore%%D:\\yckin.000\\桌面\\Attribute Core\\bin\\main"
+      },
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    },
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "Server",
+      "presentation": {
+        "group": "Mod Development - Attribute Core",
+        "order": 3
+      },
+      "projectName": "Attribute Core",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@D:\\yckin.000\\桌面\\Attribute Core\\build\\moddev\\serverRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@D:\\yckin.000\\桌面\\Attribute Core\\build\\moddev\\serverRunVmArgs.txt",
+        "-Dfml.modFolders\u003dattributecore%%D:\\yckin.000\\桌面\\Attribute Core\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\run",
+      "env": {
+        "MOD_CLASSES": "attributecore%%D:\\yckin.000\\桌面\\Attribute Core\\bin\\main"
+      },
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    }
+  ]
+}

@@ -8,6 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.common.Mod;
@@ -21,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@Mod.EventBusSubscriber(modid = AttributeCore.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = AttributeCore.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE,value = Dist.DEDICATED_SERVER)
 public class CelestialEssenceEvent {
     private static final int TICKS_PER_MINUTE = 10*20;
     private static final Map<ServerPlayer, Integer> tickCounters = new HashMap<>();
@@ -51,34 +52,14 @@ public class CelestialEssenceEvent {
 
     @SubscribeEvent
     public static void onPlayerJoin(EntityJoinLevelEvent event) {
-        if(!event.getLevel().isClientSide()) {
-            if (!event.getLevel().isClientSide()) {
-                if (event.getEntity() instanceof ServerPlayer player) {
-                    Optional<CelestialEssence> optionalPlayerXp =
-                            Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
-                    optionalPlayerXp.ifPresent(CE -> {
-                        CompoundTag playerData = player.getPersistentData();
-                        CE.loadData(playerData);
-                        if (playerData.contains("ethereal_essence")) {
-                            CompoundTag etherealEssence = playerData.getCompound("ethereal_essence");
-                            LOGGER.info("Player {}'s Ethereal Essence data has been loaded. Ethereal Essence: {}", etherealEssence);
-                        }
-                    });
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onPlayerLeave(EntityLeaveLevelEvent event) {
         if (!event.getLevel().isClientSide()) {
             if (event.getEntity() instanceof ServerPlayer player) {
                 Optional<CelestialEssence> optionalPlayerXp =
                         Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
                 optionalPlayerXp.ifPresent(CE -> {
-                    CompoundTag playerData = player.getPersistentData();
-                    CE.saveData(playerData);
-                    LOGGER.info("Player {}'s Ethereal Essence data has been saved.", player.getName().getString());
+                    PacketDistributor.PLAYER.with(player)
+                            .send(new CelestialEssenceData(CE.getCultivationRealm(), CE.getStageRank(), CE.getEtherealEssence()));
+                    LOGGER.info("Player's Ethereal Essence data has been loaded. Ethereal Essence: {}", CE.getEtherealEssence());
                 });
             }
         }
