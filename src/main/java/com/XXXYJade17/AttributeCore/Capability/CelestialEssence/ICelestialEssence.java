@@ -8,7 +8,10 @@ public interface ICelestialEssence {
     int getStageRank();
     void setStageRank(int stageRank);
     int getEtherealEssence();
-    void setEtherealEssence(int etherealEssence);
+    void addEtherealEssence(int etherealEssence);
+    boolean hasShackle();
+    boolean isReachShackle();
+    void breakShackle();
     void saveData(CompoundTag nbt);
     void loadData(CompoundTag nbt);
 }

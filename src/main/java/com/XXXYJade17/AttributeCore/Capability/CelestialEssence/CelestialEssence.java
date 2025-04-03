@@ -1,8 +1,11 @@
 package com.XXXYJade17.AttributeCore.Capability.CelestialEssence;
 
+import com.XXXYJade17.AttributeCore.AttributeCore;
+import com.XXXYJade17.AttributeCore.Config.Config;
 import net.minecraft.nbt.CompoundTag;
 
 public class CelestialEssence implements ICelestialEssence {
+    private static final Config config= AttributeCore.getConfig();
     private int cultivationRealm =1;
     private int stageRank =1;
     private int etherealEssence=0;
@@ -33,8 +36,37 @@ public class CelestialEssence implements ICelestialEssence {
     }
 
     @Override
-    public void setEtherealEssence(int etherealEssence) {
-        this.etherealEssence = etherealEssence;
+    public void addEtherealEssence(int etherealEssence) {
+        this.etherealEssence += etherealEssence;
+        if(!hasShackle()){
+            this.etherealEssence -= config.getEtherealEssence(cultivationRealm, stageRank);
+            stageRank += 1;
+        }else{
+            if(this.etherealEssence >= config.getEtherealEssence(cultivationRealm, stageRank)) {
+                this.etherealEssence = config.getEtherealEssence(cultivationRealm, stageRank);
+            }
+        }
+    }
+
+    @Override
+    public boolean hasShackle() {
+        return config.getShackle(cultivationRealm, stageRank);
+    }
+
+    @Override
+    public boolean isReachShackle() {
+        return hasShackle() && etherealEssence == config.getEtherealEssence(cultivationRealm, stageRank);
+    }
+
+    @Override
+    public void breakShackle() {
+        this.etherealEssence=0;
+        if(stageRank==10){
+            stageRank=1;
+            cultivationRealm+=1;
+        }else{
+            stageRank+=1;
+        }
     }
 
     @Override

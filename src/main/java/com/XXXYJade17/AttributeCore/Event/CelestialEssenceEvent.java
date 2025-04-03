@@ -5,9 +5,7 @@ import com.XXXYJade17.AttributeCore.Capability.CelestialEssence.CelestialEssence
 import com.XXXYJade17.AttributeCore.Capability.Handler.CapabilityHandler;
 import com.XXXYJade17.AttributeCore.Data.Client.CelestialEssenceData;
 import com.XXXYJade17.AttributeCore.Data.Server.CelestialEssenceSavedData;
-import com.XXXYJade17.AttributeCore.PlayerUUID.PlayerUUID;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.api.distmarker.Dist;
@@ -17,7 +15,6 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.TickEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
-import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -43,7 +40,7 @@ public class CelestialEssenceEvent {
                     int tickCounter = tickCounters.getOrDefault(player, 0)+1;
                     if (tickCounter >= TICKS_PER_MINUTE) {
                         tickCounters.put(player, 0);
-                        CE.setEtherealEssence(CE.getEtherealEssence() + 1);
+                        CE.addEtherealEssence(1);
                         PacketDistributor.PLAYER.with(player)
                                 .send(new CelestialEssenceData(CE.getCultivationRealm(), CE.getStageRank(), CE.getEtherealEssence()));
                     } else {
@@ -58,7 +55,7 @@ public class CelestialEssenceEvent {
     public static void onPlayerJoin(EntityJoinLevelEvent event) {
         if (!event.getLevel().isClientSide()) {
             if (event.getEntity() instanceof ServerPlayer player) {
-                PlayerUUID.addPlayer(player);
+                CelestialEssenceSavedData.addUUID(player);
                 Optional<CelestialEssence> optionalPlayerXp =
                         Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
                 optionalPlayerXp.ifPresent(CE -> {

@@ -18,6 +18,15 @@ import java.util.UUID;
 public class CelestialEssenceSavedData extends SavedData {
     private static final String DATA_NAME = "CelestialEssenceSavedData";
     private static final Map<UUID, CelestialEssence> playerData = new HashMap<>();
+    private static final Map<String, UUID> playerUUID=new HashMap<>();
+
+    public static void addUUID(Player player){
+        playerUUID.put(player.getName().getString(), player.getUUID());
+    }
+
+    public static UUID getUUID(String playerName){
+        return playerUUID.get(playerName);
+    }
 
     public static CelestialEssenceSavedData get(ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(
@@ -47,11 +56,22 @@ public class CelestialEssenceSavedData extends SavedData {
             playerList.add(playerTag);
         }
         compound.put("Players", playerList);
+
+        ListTag uuidList = new ListTag();
+        for (Map.Entry<String, UUID> entry : playerUUID.entrySet()) {
+            CompoundTag uuidTag = new CompoundTag();
+            uuidTag.putString("PlayerName", entry.getKey());
+            uuidTag.putUUID("PlayerUUID", entry.getValue());
+            uuidList.add(uuidTag);
+        }
+        compound.put("PlayerUUIDMap", uuidList);
+
         return compound;
     }
 
     public static CelestialEssenceSavedData load(CompoundTag compound) {
         CelestialEssenceSavedData savedData = new CelestialEssenceSavedData();
+
         ListTag playerList = compound.getList("Players", Tag.TAG_COMPOUND);
         for (int i = 0; i < playerList.size(); i++) {
             CompoundTag playerTag = playerList.getCompound(i);
@@ -61,6 +81,15 @@ public class CelestialEssenceSavedData extends SavedData {
             data.loadData(dataTag);
             savedData.playerData.put(playerUUID, data);
         }
+
+        ListTag uuidList = compound.getList("PlayerUUIDMap", Tag.TAG_COMPOUND);
+        for (int i = 0; i < uuidList.size(); i++) {
+            CompoundTag uuidTag = uuidList.getCompound(i);
+            String playerName = uuidTag.getString("PlayerName");
+            UUID uuid = uuidTag.getUUID("PlayerUUID");
+            savedData.playerUUID.put(playerName, uuid);
+        }
+
         return savedData;
     }
 

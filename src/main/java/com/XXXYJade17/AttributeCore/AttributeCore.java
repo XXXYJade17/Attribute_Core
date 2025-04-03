@@ -25,6 +25,10 @@ public class AttributeCore {
         return LOGGER;
     }
 
+    public static Config getConfig() {
+        return config;
+    }
+
     public AttributeCore(IEventBus bus, ModContainer modContainer) {
         adminCommand=AdminCommand.getINSTANCE();
         playerCommand=PlayerCommand.getINSTANCE();

@@ -2,17 +2,14 @@ package com.XXXYJade17.AttributeCore.Command;
 
 import com.XXXYJade17.AttributeCore.Capability.CelestialEssence.CelestialEssence;
 import com.XXXYJade17.AttributeCore.Data.Server.CelestialEssenceSavedData;
-import com.XXXYJade17.AttributeCore.PlayerUUID.PlayerUUID;
 import com.XXXYJade17.AttributeCore.AttributeCore;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import net.minecraft.client.gui.screens.social.PlayerSocialManager;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
 
 import java.util.UUID;
@@ -128,7 +125,7 @@ public class AdminCommand {
 
     private int getPlayerCelestialEssence(CommandContext<CommandSourceStack> context){
         String playerName = StringArgumentType.getString(context, "player");
-        UUID playerUUID = PlayerUUID.getUUID(playerName);
+        UUID playerUUID = CelestialEssenceSavedData.getUUID(playerName);
         if(playerUUID!=null){
             CelestialEssence playerCE = CelestialEssenceSavedData.getPlayerData(playerUUID);
             context.getSource().sendSuccess(() -> Component.literal("管理test1"), false);
@@ -139,7 +136,7 @@ public class AdminCommand {
 
     private int setCultivationRealm(CommandContext<CommandSourceStack> context){
         String playerName = StringArgumentType.getString(context, "player");
-        UUID playerUUID = PlayerUUID.getUUID(playerName);
+        UUID playerUUID = CelestialEssenceSavedData.getUUID(playerName);
         String oldLevel=StringArgumentType.getString(context, "old");
         String newLevel=StringArgumentType.getString(context, "new");
         //修改逻辑暂时省略
@@ -149,7 +146,7 @@ public class AdminCommand {
 
     private int setStageRank(CommandContext<CommandSourceStack> context){
         String playerName = StringArgumentType.getString(context, "player");
-        UUID playerUUID = PlayerUUID.getUUID(playerName);
+        UUID playerUUID = CelestialEssenceSavedData.getUUID(playerName);
         String oldLevel=StringArgumentType.getString(context, "old");
         String newLevel=StringArgumentType.getString(context, "new");
         //修改逻辑暂时省略
@@ -159,7 +156,7 @@ public class AdminCommand {
 
     private int setEtherealEssence(CommandContext<CommandSourceStack> context){
         String playerName = StringArgumentType.getString(context, "player");
-        UUID playerUUID = PlayerUUID.getUUID(playerName);
+        UUID playerUUID = CelestialEssenceSavedData.getUUID(playerName);
         String oldLevel=StringArgumentType.getString(context, "old");
         String newLevel=StringArgumentType.getString(context, "new");
         //修改逻辑暂时省略
@@ -169,7 +166,7 @@ public class AdminCommand {
 
     private int addEtherealEssence(CommandContext<CommandSourceStack> context){
         String playerName = StringArgumentType.getString(context, "player");
-        UUID playerUUID = PlayerUUID.getUUID(playerName);
+        UUID playerUUID = CelestialEssenceSavedData.getUUID(playerName);
         int num = Integer.parseInt(StringArgumentType.getString(context, "num"));
         //修改逻辑暂时省略
         context.getSource().sendSuccess(() -> Component.literal("管理test5"), false);
