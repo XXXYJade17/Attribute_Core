@@ -4,6 +4,8 @@ import com.XXXYJade17.AttributeCore.AttributeCore;
 import com.XXXYJade17.AttributeCore.Capability.CelestialEssence.CelestialEssence;
 import com.XXXYJade17.AttributeCore.Capability.Handler.CapabilityHandler;
 import com.XXXYJade17.AttributeCore.Data.Client.CelestialEssenceData;
+import com.XXXYJade17.AttributeCore.Data.Server.CelestialEssenceSavedData;
+import com.XXXYJade17.AttributeCore.PlayerUUID.PlayerUUID;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -15,6 +17,9 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.TickEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.slf4j.Logger;
 
@@ -24,7 +29,7 @@ import java.util.Optional;
 
 @Mod.EventBusSubscriber(modid = AttributeCore.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE,value = Dist.DEDICATED_SERVER)
 public class CelestialEssenceEvent {
-    private static final int TICKS_PER_MINUTE = 10*20;
+    private static final int TICKS_PER_MINUTE = 30*20;
     private static final Map<ServerPlayer, Integer> tickCounters = new HashMap<>();
     private static final Logger LOGGER = AttributeCore.getLOGGER();
 
@@ -41,7 +46,6 @@ public class CelestialEssenceEvent {
                         CE.setEtherealEssence(CE.getEtherealEssence() + 1);
                         PacketDistributor.PLAYER.with(player)
                                 .send(new CelestialEssenceData(CE.getCultivationRealm(), CE.getStageRank(), CE.getEtherealEssence()));
-                        player.sendSystemMessage(Component.literal("当前EE:" + CE.getEtherealEssence()));
                     } else {
                         tickCounters.put(player, tickCounter);
                     }
@@ -54,17 +58,42 @@ public class CelestialEssenceEvent {
     public static void onPlayerJoin(EntityJoinLevelEvent event) {
         if (!event.getLevel().isClientSide()) {
             if (event.getEntity() instanceof ServerPlayer player) {
-
+                PlayerUUID.addPlayer(player);
                 Optional<CelestialEssence> optionalPlayerXp =
                         Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
                 optionalPlayerXp.ifPresent(CE -> {
-                    CompoundTag playerData = player.getPersistentData();
-                    CE.loadData(playerData);
+                    CelestialEssenceSavedData savedData = CelestialEssenceSavedData.get((ServerLevel) event.getLevel());
+                    CompoundTag data=new CompoundTag();
+                    savedData.getPlayerData(player.getUUID()).saveData(data);
+                    CE.loadData(data);
                     PacketDistributor.PLAYER.with(player)
                             .send(new CelestialEssenceData(CE.getCultivationRealm(), CE.getStageRank(), CE.getEtherealEssence()));
-                    LOGGER.info("Player's Ethereal Essence data has been loaded. Ethereal Essence: {}", CE.getEtherealEssence());
                 });
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLeave(EntityLeaveLevelEvent event) {
+        if (!event.getLevel().isClientSide()) {
+            if (event.getEntity() instanceof ServerPlayer player) {
+                Optional<CelestialEssence> optionalPlayerXp =
+                        Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
+                optionalPlayerXp.ifPresent(CE -> {
+                    CelestialEssenceSavedData savedData = CelestialEssenceSavedData.get((ServerLevel) event.getLevel());
+                    savedData.savePlayerData(player.getUUID(), CE);
+                });
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onServerStarting(ServerStartingEvent event) {
+        CelestialEssenceSavedData.loadAllPlayersData();
+    }
+
+    @SubscribeEvent
+    public static void onServerStopping(ServerStoppingEvent event) {
+        CelestialEssenceSavedData.saveAllPlayersData();
     }
 }
