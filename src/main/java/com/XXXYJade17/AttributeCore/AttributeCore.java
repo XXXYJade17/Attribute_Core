@@ -18,17 +18,20 @@ public class AttributeCore {
     public static final String MODID = "attributecore";
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Config config=Config.getINSTANCE();
-    private static final AdminCommand adminCommand=AdminCommand.getINSTANCE();
-    private static final PlayerCommand playerCommand=PlayerCommand.getINSTANCE();
+    private static AdminCommand adminCommand;
+    private static PlayerCommand playerCommand;
 
     public static Logger getLOGGER() {
         return LOGGER;
     }
 
     public AttributeCore(IEventBus bus, ModContainer modContainer) {
-        NeoForge.EVENT_BUS.addListener((ServerStartingEvent event) ->{
-                adminCommand.registerCommand(event.getServer().getCommands().getDispatcher());
-                playerCommand.registerCommand(event.getServer().getCommands().getDispatcher());
-        });
+        adminCommand=AdminCommand.getINSTANCE();
+        playerCommand=PlayerCommand.getINSTANCE();
+        NeoForge.EVENT_BUS.addListener((ServerStartingEvent event) ->
+                playerCommand.registerCommand(event.getServer().getCommands().getDispatcher()));
+        NeoForge.EVENT_BUS.addListener((ServerStartingEvent event) ->
+                adminCommand.registerCommand(event.getServer().getCommands().getDispatcher())
+        );
     }
 }

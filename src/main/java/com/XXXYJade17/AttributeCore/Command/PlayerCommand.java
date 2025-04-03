@@ -34,27 +34,33 @@ public class PlayerCommand {
         LiteralArgumentBuilder<CommandSourceStack> CelestialEssence =
                 Commands.literal("CelestialEssence")
                         .requires(source -> source.hasPermission(0))
-                        .then(Commands.literal("get"))
-                        .executes(this::getCelestialEssence);
+                        .then(Commands.literal("get")
+                                .executes(this::getCelestialEssence));
+
         LiteralArgumentBuilder<CommandSourceStack> CE =
-                Commands.literal("CelestialEssence")
+                Commands.literal("CE")
                         .requires(source -> source.hasPermission(0))
-                        .then(Commands.literal("get"))
-                        .executes(this::getCelestialEssence);
+                        .then(Commands.literal("get")
+                                .executes(this::getCelestialEssence));
+
         dispatcher.register(CelestialEssence);
         dispatcher.register(CE);
     }
 
-    private int getCelestialEssence(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        Player player = context.getSource().getPlayerOrException();
-        Optional<CelestialEssence> optionalPlayerXp =
-                Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
-        optionalPlayerXp.ifPresent(CE -> {
-            int cultivationRealm=CE.getCultivationRealm();
-            int stageRank=CE.getStageRank();
-            int etherealEssence=CE.getEtherealEssence();
-            context.getSource().sendSuccess(() -> Component.literal("境界Test"), false);
-        });
-        return 1;
+    private int getCelestialEssence(CommandContext<CommandSourceStack> context) {
+        try {
+            Player player = context.getSource().getPlayerOrException();
+            Optional<CelestialEssence> optionalPlayerXp =
+                    Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
+            optionalPlayerXp.ifPresent(CE -> {
+                int cultivationRealm = CE.getCultivationRealm();
+                int stageRank = CE.getStageRank();
+                int etherealEssence = CE.getEtherealEssence();
+                context.getSource().sendSuccess(() -> Component.literal("境界Test"), false);
+            });
+            return 1;
+        } catch (CommandSyntaxException e) {
+            return 0;
+        }
     }
 }
