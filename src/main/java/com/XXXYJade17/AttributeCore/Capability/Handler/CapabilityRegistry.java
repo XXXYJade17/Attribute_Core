@@ -2,6 +2,7 @@ package com.XXXYJade17.AttributeCore.Capability.Handler;
 
 import com.XXXYJade17.AttributeCore.AttributeCore;
 import com.XXXYJade17.AttributeCore.Capability.CelestialEssence.CelestialEssenceProvider;
+import com.XXXYJade17.AttributeCore.Capability.Shackle.ShackleProvider;
 import net.minecraft.world.entity.EntityType;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
@@ -14,5 +15,8 @@ public class CapabilityRegistry {
         event.registerEntity(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER,
                 EntityType.PLAYER,
                 new CelestialEssenceProvider());
+        event.registerEntity(CapabilityHandler.SHACKLE_HANDLER,
+                EntityType.PLAYER,
+                new ShackleProvider());
     }
 }

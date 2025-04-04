@@ -32,7 +32,6 @@ public class CelestialEssenceSavedData extends SavedData {
         return level.getDataStorage().computeIfAbsent(
                 new SavedData.Factory<>(CelestialEssenceSavedData::new, CelestialEssenceSavedData::load),
                 DATA_NAME);
-
     }
 
     public static CelestialEssence getPlayerData(UUID playerUUID) {

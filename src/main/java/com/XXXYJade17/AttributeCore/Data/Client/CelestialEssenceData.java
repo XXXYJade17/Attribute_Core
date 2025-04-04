@@ -6,7 +6,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public record CelestialEssenceData(int cultivationRealm, int stageRank,int etherealEssence) implements CustomPacketPayload {
-
     public static final ResourceLocation ID = new ResourceLocation(AttributeCore.MODID, "celestial_essence_data");
 
     public CelestialEssenceData(FriendlyByteBuf buf){

@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 
-import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -22,6 +21,8 @@ public class Config {
     private static final Map<Integer,String> CultivationRealm = new HashMap<>();
     private static Map<Integer,Map<Integer,Integer>> StageRank = new HashMap<>();
     private static Map<Integer, Map<Integer,Boolean>> Shackle= new HashMap<>();
+    private static Map<Integer, Map<Integer,Integer>> InitialBreakRate = new HashMap<>();
+    private static Map<Integer, Map<Integer,Integer>> BreakRatePerAdd = new HashMap<>();
 
     private Config() {
         try {
@@ -107,13 +108,32 @@ public class Config {
             }
         }
         Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
-        JsonObject cultivationRealm = gson.fromJson(reader, JsonObject.class);
-        for (int i = 1; i <= cultivationRealm.size(); i++) {
-            JsonObject stageRank = cultivationRealm.get(String.valueOf(i)).getAsJsonObject();
+        JsonObject celestialEssence = gson.fromJson(reader, JsonObject.class);
+        for (int i = 1; i <= celestialEssence.size(); i++) {
+            JsonObject cultivationRealm = celestialEssence.get(String.valueOf(i)).getAsJsonObject();
             Map<Integer,Boolean> shackle = new HashMap<>();
-            for (int j = 1; j <= stageRank.size(); j++) {
-                boolean isShackle = stageRank.get(String.valueOf(i)).getAsBoolean();
+            for (int j = 1; j <= cultivationRealm.size(); j++) {
+                JsonObject stageRank = cultivationRealm.get(String.valueOf(i)).getAsJsonObject();
+                boolean isShackle = stageRank.get("shackle").getAsBoolean();
                 shackle.put(j,isShackle);
+                if(isShackle){
+                    int breakRate = stageRank.get("initial_break_rate").getAsInt();
+                    if (InitialBreakRate.get(i) == null) {
+                        Map<Integer,Integer> initialBreakRate = new HashMap<>();
+                        initialBreakRate.put(j, breakRate);
+                        InitialBreakRate.put(i,initialBreakRate);
+                    } else {
+                        InitialBreakRate.get(i).put(j, breakRate);
+                    }
+                    int addRate = stageRank.get("rate_per_add").getAsInt();
+                    if (BreakRatePerAdd.get(i) == null) {
+                        Map<Integer,Integer> breakRatePerAdd = new HashMap<>();
+                        breakRatePerAdd.put(j,addRate);
+                        BreakRatePerAdd.put(i,breakRatePerAdd);
+                    } else {
+                        BreakRatePerAdd.get(i).put(j,addRate);
+                    }
+                }
             }
             Shackle.put(i,shackle);
         }
