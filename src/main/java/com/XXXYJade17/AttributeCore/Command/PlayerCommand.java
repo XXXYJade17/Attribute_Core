@@ -3,6 +3,7 @@ package com.XXXYJade17.AttributeCore.Command;
 import com.XXXYJade17.AttributeCore.AttributeCore;
 import com.XXXYJade17.AttributeCore.Capability.CelestialEssence.CelestialEssence;
 import com.XXXYJade17.AttributeCore.Capability.Handler.CapabilityHandler;
+import com.XXXYJade17.AttributeCore.Config.Config;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class PlayerCommand {
     private static PlayerCommand INSTANCE;
     private static final Logger LOGGER= AttributeCore.getLOGGER();
+    private static final Config config= Config.getINSTANCE();
 
     public static PlayerCommand getINSTANCE() {
         if (INSTANCE == null) {
@@ -53,10 +55,11 @@ public class PlayerCommand {
             Optional<CelestialEssence> optionalPlayerXp =
                     Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
             optionalPlayerXp.ifPresent(CE -> {
-                int cultivationRealm = CE.getCultivationRealm();
-                int stageRank = CE.getStageRank();
+                String cultivationRealm=config.getCultivationRealm(CE.getCultivationRealm());
+                String stageRank=config.getCultivationRealm(CE.getStageRank());
                 int etherealEssence = CE.getEtherealEssence();
-                context.getSource().sendSuccess(() -> Component.literal("境界Test"), false);
+                context.getSource().sendSuccess(() ->
+                        config.getMessage("ce.get",cultivationRealm,stageRank,etherealEssence), false);
             });
             return 1;
         } catch (CommandSyntaxException e) {

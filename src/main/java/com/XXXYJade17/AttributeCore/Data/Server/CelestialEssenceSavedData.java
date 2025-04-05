@@ -45,25 +45,26 @@ public class CelestialEssenceSavedData extends SavedData {
 
     @Override
     public CompoundTag save(CompoundTag compound) {
-        ListTag playerList = new ListTag();
+        ListTag celestialEssenceSavedData = new ListTag();
         for (Map.Entry<UUID, CelestialEssence> entry : playerData.entrySet()) {
-            CompoundTag playerTag = new CompoundTag();
-            playerTag.putUUID("PlayerUUID", entry.getKey());
-            CompoundTag dataTag = new CompoundTag();
-            entry.getValue().saveData(dataTag);
-            playerTag.put("StageRank.json", dataTag);
-            playerList.add(playerTag);
+            CompoundTag player = new CompoundTag();
+                UUID uuid = entry.getKey();
+                player.putUUID("UUID", uuid);
+                CompoundTag celestialEssence = new CompoundTag();
+                    entry.getValue().saveData(celestialEssence);
+                player.put("CelestialEssence", celestialEssence);
+            celestialEssenceSavedData.add(player);
         }
-        compound.put("Players", playerList);
+        compound.put("CelestialEssenceSavedData", celestialEssenceSavedData);
 
         ListTag uuidList = new ListTag();
         for (Map.Entry<String, UUID> entry : playerUUID.entrySet()) {
             CompoundTag uuidTag = new CompoundTag();
-            uuidTag.putString("PlayerName", entry.getKey());
-            uuidTag.putUUID("PlayerUUID", entry.getValue());
+            uuidTag.putString("Name", entry.getKey());
+            uuidTag.putUUID("UUID", entry.getValue());
             uuidList.add(uuidTag);
         }
-        compound.put("PlayerUUIDMap", uuidList);
+        compound.put("UUIDList", uuidList);
 
         return compound;
     }
@@ -71,24 +72,23 @@ public class CelestialEssenceSavedData extends SavedData {
     public static CelestialEssenceSavedData load(CompoundTag compound) {
         CelestialEssenceSavedData savedData = new CelestialEssenceSavedData();
 
-        ListTag playerList = compound.getList("Players", Tag.TAG_COMPOUND);
-        for (int i = 0; i < playerList.size(); i++) {
-            CompoundTag playerTag = playerList.getCompound(i);
-            UUID playerUUID = playerTag.getUUID("PlayerUUID");
-            CompoundTag dataTag = playerTag.getCompound("StageRank.json");
+        ListTag celestialEssenceSavedData = compound.getList("CelestialEssenceSavedData", Tag.TAG_COMPOUND);
+        for (int i = 0; i < celestialEssenceSavedData.size(); i++) {
+            CompoundTag playerTag = celestialEssenceSavedData.getCompound(i);
+            UUID uuid = playerTag.getUUID("UUID");
+            CompoundTag celestialEssence = playerTag.getCompound("CelestialEssence");
             CelestialEssence data = new CelestialEssence();
-            data.loadData(dataTag);
-            savedData.playerData.put(playerUUID, data);
+                data.loadData(celestialEssence);
+            savedData.playerData.put(uuid, data);
         }
 
-        ListTag uuidList = compound.getList("PlayerUUIDMap", Tag.TAG_COMPOUND);
+        ListTag uuidList = compound.getList("UUIDList", Tag.TAG_COMPOUND);
         for (int i = 0; i < uuidList.size(); i++) {
             CompoundTag uuidTag = uuidList.getCompound(i);
-            String playerName = uuidTag.getString("PlayerName");
-            UUID uuid = uuidTag.getUUID("PlayerUUID");
-            savedData.playerUUID.put(playerName, uuid);
+                String name = uuidTag.getString("Name");
+                UUID uuid = uuidTag.getUUID("UUID");
+            savedData.playerUUID.put(name, uuid);
         }
-
         return savedData;
     }
 

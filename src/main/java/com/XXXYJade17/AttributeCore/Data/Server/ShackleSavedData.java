@@ -39,21 +39,30 @@ public class ShackleSavedData extends SavedData {
     public CompoundTag save(CompoundTag compound) {
         ListTag playerList = new ListTag();
         for (Map.Entry<UUID, Shackle> entry : playerData.entrySet()) {
-            UUID playerUUID = entry.getKey();
-            Shackle shackle = entry.getValue();
-            CompoundTag playerTag = new CompoundTag();
-            playerTag.putUUID("uuid", playerUUID);
-            CompoundTag shackleTag = new CompoundTag();
-            shackle.saveData(shackleTag);
-            playerTag.put("shackle", shackleTag);
-            playerList.add(playerTag);
-            compound.put("players", playerList);
+            CompoundTag player = new CompoundTag();
+                UUID uuid = entry.getKey();
+                player.putUUID("UUID", uuid);
+                CompoundTag shackle = new CompoundTag();
+                    entry.getValue().saveData(shackle);
+                player.put("Shackle", shackle);
+            playerList.add(player);
         }
+        compound.put("ShackleSavedData", playerList);
         return compound;
     }
 
     public static ShackleSavedData load(CompoundTag compound) {
         ShackleSavedData savedData = new ShackleSavedData();
+
+        ListTag shackleSavedData = compound.getList("ShackleSavedData", Tag.TAG_COMPOUND);
+        for (int i = 0; i < shackleSavedData.size(); i++) {
+            CompoundTag playerTag = shackleSavedData.getCompound(i);
+            UUID uuid = playerTag.getUUID("UUID");
+            CompoundTag shackle = playerTag.getCompound("Shackle");
+            Shackle data = new Shackle();
+            data.loadData(shackle);
+            savedData.playerData.put(uuid, data);
+        }
         return savedData;
     }
 

@@ -15,6 +15,11 @@ public class Shackle implements IShackle{
     }
 
     @Override
+    public void setShackle(boolean shackle) {
+        this.shackle=shackle;
+    }
+
+    @Override
     public void addBreakRate(int rate) {
         break_rate+=rate;
     }
@@ -27,6 +32,16 @@ public class Shackle implements IShackle{
     @Override
     public void setRatePerAdd(int rate) {
         rate_per_add=rate;
+    }
+
+    @Override
+    public int getBreakRate() {
+        return break_rate;
+    }
+
+    @Override
+    public int getRatePerAdd() {
+        return rate_per_add;
     }
 
     @Override

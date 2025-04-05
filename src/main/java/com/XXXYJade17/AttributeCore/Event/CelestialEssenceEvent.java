@@ -3,6 +3,8 @@ package com.XXXYJade17.AttributeCore.Event;
 import com.XXXYJade17.AttributeCore.AttributeCore;
 import com.XXXYJade17.AttributeCore.Capability.CelestialEssence.CelestialEssence;
 import com.XXXYJade17.AttributeCore.Capability.Handler.CapabilityHandler;
+import com.XXXYJade17.AttributeCore.Capability.Shackle.Shackle;
+import com.XXXYJade17.AttributeCore.Config.Config;
 import com.XXXYJade17.AttributeCore.Data.Client.CelestialEssenceData;
 import com.XXXYJade17.AttributeCore.Data.Server.CelestialEssenceSavedData;
 import net.minecraft.nbt.CompoundTag;
@@ -29,22 +31,33 @@ public class CelestialEssenceEvent {
     private static final int TICKS_PER_MINUTE = 30*20;
     private static final Map<ServerPlayer, Integer> tickCounters = new HashMap<>();
     private static final Logger LOGGER = AttributeCore.getLOGGER();
+    private static final Config config= Config.getINSTANCE();
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if(event.side == LogicalSide.SERVER) {
             if (event.player instanceof ServerPlayer player) {
-                Optional<CelestialEssence> optionalPlayerXp =
-                        Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
-                optionalPlayerXp.ifPresent(CE -> {
-                    int tickCounter = tickCounters.getOrDefault(player, 0)+1;
-                    if (tickCounter >= TICKS_PER_MINUTE) {
-                        tickCounters.put(player, 0);
-                        CE.addEtherealEssence(1);
-                        PacketDistributor.PLAYER.with(player)
-                                .send(new CelestialEssenceData(CE.getCultivationRealm(), CE.getStageRank(), CE.getEtherealEssence()));
-                    } else {
-                        tickCounters.put(player, tickCounter);
+                Optional<Shackle> optionalShackle=
+                        Optional.ofNullable(player.getCapability(CapabilityHandler.SHACKLE_HANDLER));
+                optionalShackle.ifPresent(shackle ->{
+                    if(!shackle.hasShackle()){
+                        Optional<CelestialEssence> optionalPlayerXp =
+                                Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
+                        optionalPlayerXp.ifPresent(CE -> {
+                            int tickCounter = tickCounters.getOrDefault(player, 0)+1;
+                            if (tickCounter >= TICKS_PER_MINUTE) {
+                                tickCounters.put(player, 0);
+                                CE.addEtherealEssence(1);
+                                player.sendSystemMessage(config.getMessage("online.reward",1));
+                                if(CE.isReachShackle()){
+                                    shackle.setShackle(true);
+                                }
+                                PacketDistributor.PLAYER.with(player)
+                                        .send(new CelestialEssenceData(CE.getCultivationRealm(), CE.getStageRank(), CE.getEtherealEssence()));
+                            } else {
+                                tickCounters.put(player, tickCounter);
+                            }
+                        });
                     }
                 });
             }
