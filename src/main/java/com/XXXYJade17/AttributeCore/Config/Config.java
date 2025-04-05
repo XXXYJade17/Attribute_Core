@@ -202,15 +202,40 @@ public class Config {
     }
 
     public String getCultivationRealm(int cultivationRealm) {
-        return CultivationRealm.get(cultivationRealm);
+        return CultivationRealm.get(cultivationRealm)!=null ? CultivationRealm.get(cultivationRealm) : "";
+    }
+
+    public String getStageRank(int stageRank){
+        return switch (stageRank){
+            case 1-> "第一重";
+            case 2-> "第二重";
+            case 3-> "第三重";
+            case 4-> "第四重";
+            case 5-> "第五重";
+            case 6-> "第六重";
+            case 7-> "第七重";
+            case 8-> "第八重";
+            case 9-> "第九重";
+            case 10-> "第十重";
+            default -> "";
+        };
     }
 
     public int getEtherealEssence(int cultivationRealm, int stageRank) {
-        return StageRank.get(cultivationRealm).get(stageRank);
+        Map<Integer, Integer> etherealEssenceMap = StageRank.get(cultivationRealm);
+        if (etherealEssenceMap != null) {
+            Integer essence = etherealEssenceMap.get(stageRank);
+            return essence != null ? essence : 0;
+        }
+        return 0;
     }
 
-    public boolean getShackle(int cultivationRealm, int stageRank) {
-        return Shackle.get(cultivationRealm).get(stageRank);
+    public boolean getShackle(int cultivationRealm, int stageRank) {Map<Integer, Boolean> shackleMap = Shackle.get(cultivationRealm);
+        if (shackleMap != null) {
+            Boolean isShackle = shackleMap.get(stageRank);
+            return isShackle != null && isShackle;
+        }
+        return false;
     }
 
     public String getLogMessage(String key) {

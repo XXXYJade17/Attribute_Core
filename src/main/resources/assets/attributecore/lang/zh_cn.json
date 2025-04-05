@@ -1,4 +1,8 @@
 {
   "online.reward" : "在线魔力成长 +%d",
-  "ce.get" : "%s %s 魔力: %d"
+  "ce.get" : "%s %s 魔力: %d",
+  "ce.admin.add" : "玩家%s的魔力增加成功",
+  "ce.admin.change" : "玩家%s的%s修改成功",
+  "ce.admin.empty" : "玩家%s不存在",
+  "ce.admin.get" : "玩家%s: %s %s 魔力: %d"
 }

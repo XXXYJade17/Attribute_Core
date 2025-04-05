@@ -1,4 +1,8 @@
 {
   "online.reward" : "Online Ethereal Essence growth +%d",
-  "ce.get" : "%s %s Ethereal Essence: %d"
+  "ce.get" : "%s %s Ethereal Essence: %d",
+  "ce.admin.add" : "Player %s's Ethereal Essence has been added Successfully!",
+  "ce.admin.change" : "Player %s's %s has been changed Successfully!",
+  "ce.admin.empty" : "Player %s is null",
+  "ce.admin.get" : "Player %s : %s %s Ethereal Essence: %d"
 }

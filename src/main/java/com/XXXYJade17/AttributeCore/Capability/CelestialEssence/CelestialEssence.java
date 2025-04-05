@@ -38,14 +38,21 @@ public class CelestialEssence implements ICelestialEssence {
     @Override
     public void addEtherealEssence(int etherealEssence) {
         this.etherealEssence += etherealEssence;
-        if(!hasShackle()){
-            this.etherealEssence -= config.getEtherealEssence(cultivationRealm, stageRank);
-            stageRank += 1;
-        }else{
-            if(this.etherealEssence >= config.getEtherealEssence(cultivationRealm, stageRank)) {
-                this.etherealEssence = config.getEtherealEssence(cultivationRealm, stageRank);
+        if(this.etherealEssence >= config.getEtherealEssence(cultivationRealm, stageRank)) {
+            if (!hasShackle()) {
+                this.etherealEssence -= config.getEtherealEssence(cultivationRealm, stageRank);
+                stageRank += 1;
+            } else {
+                if (this.etherealEssence >= config.getEtherealEssence(cultivationRealm, stageRank)) {
+                    this.etherealEssence = config.getEtherealEssence(cultivationRealm, stageRank);
+                }
             }
         }
+    }
+
+    @Override
+    public void setEtherealEssence(int etherealEssence) {
+        this.etherealEssence=etherealEssence;
     }
 
     @Override

@@ -52,11 +52,11 @@ public class PlayerCommand {
     private int getCelestialEssence(CommandContext<CommandSourceStack> context) {
         try {
             Player player = context.getSource().getPlayerOrException();
-            Optional<CelestialEssence> optionalPlayerXp =
+            Optional<CelestialEssence> optionalCE =
                     Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
-            optionalPlayerXp.ifPresent(CE -> {
+            optionalCE.ifPresent(CE -> {
                 String cultivationRealm=config.getCultivationRealm(CE.getCultivationRealm());
-                String stageRank=config.getCultivationRealm(CE.getStageRank());
+                String stageRank=config.getStageRank(CE.getStageRank());
                 int etherealEssence = CE.getEtherealEssence();
                 context.getSource().sendSuccess(() ->
                         config.getMessage("ce.get",cultivationRealm,stageRank,etherealEssence), false);

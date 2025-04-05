@@ -1,6 +1,9 @@
 package com.XXXYJade17.AttributeCore.Command;
 
 import com.XXXYJade17.AttributeCore.Capability.CelestialEssence.CelestialEssence;
+import com.XXXYJade17.AttributeCore.Capability.Handler.CapabilityHandler;
+import com.XXXYJade17.AttributeCore.Config.Config;
+import com.XXXYJade17.AttributeCore.Data.Client.CelestialEssenceData;
 import com.XXXYJade17.AttributeCore.Data.Server.CelestialEssenceSavedData;
 import com.XXXYJade17.AttributeCore.AttributeCore;
 import com.mojang.brigadier.CommandDispatcher;
@@ -10,13 +13,18 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.slf4j.Logger;
 
+import javax.swing.*;
+import java.util.Optional;
 import java.util.UUID;
 
 public class AdminCommand {
     private static AdminCommand INSTANCE;
     private static final Logger LOGGER= AttributeCore.getLOGGER();
+    private static final Config config= Config.getINSTANCE();
 
     public static AdminCommand getINSTANCE(){
         if(INSTANCE==null){
@@ -44,27 +52,24 @@ public class AdminCommand {
                 .then(Commands.literal("set")
                         .then(Commands.argument("player", StringArgumentType.word())
                                 .then(Commands.literal("CultivationRealm")
-                                        .then(Commands.argument("old", StringArgumentType.word())
-                                                .then(Commands.argument("new", StringArgumentType.word())
-                                                        .executes(this::setCultivationRealm)))))));
+                                        .then(Commands.argument("new", StringArgumentType.word())
+                                                        .executes(this::setCultivationRealm))))));
 
         Administrator.then(Commands.literal("admin")
                 .requires(source -> source.hasPermission(2))
                 .then(Commands.literal("set")
                         .then(Commands.argument("player", StringArgumentType.word())
                                 .then(Commands.literal("StageRank")
-                                        .then(Commands.argument("old", StringArgumentType.word())
-                                                .then(Commands.argument("new", StringArgumentType.word())
-                                                        .executes(this::setStageRank)))))));
+                                        .then(Commands.argument("new", StringArgumentType.word())
+                                                .executes(this::setStageRank))))));
 
         Administrator.then(Commands.literal("admin")
                 .requires(source -> source.hasPermission(2))
                 .then(Commands.literal("set")
                         .then(Commands.argument("player", StringArgumentType.word())
                                 .then(Commands.literal("EtherealEssence")
-                                        .then(Commands.argument("old", StringArgumentType.word())
-                                                .then(Commands.argument("new", StringArgumentType.word())
-                                                        .executes(this::setEtherealEssence)))))));
+                                        .then(Commands.argument("new", StringArgumentType.word())
+                                                .executes(this::setEtherealEssence))))));
 
         Administrator.then(Commands.literal("admin")
                 .requires(source -> source.hasPermission(2))
@@ -90,27 +95,24 @@ public class AdminCommand {
                 .then(Commands.literal("set")
                         .then(Commands.argument("player", StringArgumentType.word())
                                 .then(Commands.literal("CultivationRealm")
-                                        .then(Commands.argument("old", StringArgumentType.word())
-                                                .then(Commands.argument("new", StringArgumentType.word())
-                                                        .executes(this::setCultivationRealm)))))));
+                                        .then(Commands.argument("new", StringArgumentType.word())
+                                                .executes(this::setCultivationRealm))))));
 
         Admin.then(Commands.literal("admin")
                 .requires(source -> source.hasPermission(2))
                 .then(Commands.literal("set")
                         .then(Commands.argument("player", StringArgumentType.word())
                                 .then(Commands.literal("StageRank")
-                                        .then(Commands.argument("old", StringArgumentType.word())
-                                                .then(Commands.argument("new", StringArgumentType.word())
-                                                        .executes(this::setStageRank)))))));
+                                        .then(Commands.argument("new", StringArgumentType.word())
+                                                .executes(this::setStageRank))))));
 
         Admin.then(Commands.literal("admin")
                 .requires(source -> source.hasPermission(2))
                 .then(Commands.literal("set")
                         .then(Commands.argument("player", StringArgumentType.word())
                                 .then(Commands.literal("EtherealEssence")
-                                        .then(Commands.argument("old", StringArgumentType.word())
                                                 .then(Commands.argument("new", StringArgumentType.word())
-                                                        .executes(this::setEtherealEssence)))))));
+                                                        .executes(this::setEtherealEssence))))));
 
         Admin.then(Commands.literal("admin")
                 .requires(source -> source.hasPermission(2))
@@ -127,49 +129,91 @@ public class AdminCommand {
         String playerName = StringArgumentType.getString(context, "player");
         UUID playerUUID = CelestialEssenceSavedData.getUUID(playerName);
         if(playerUUID!=null){
-            CelestialEssence playerCE = CelestialEssenceSavedData.getPlayerData(playerUUID);
-            context.getSource().sendSuccess(() -> Component.literal("管理test1"), false);
+            ServerPlayer player = context.getSource().getServer().getPlayerList().getPlayer(playerUUID);
+            Optional<CelestialEssence> optionalCE =
+                    Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
+            optionalCE.ifPresent(CE -> {
+                String cultivationRealm= config.getCultivationRealm(CE.getCultivationRealm());
+                String stageRank= config.getStageRank(CE.getStageRank());
+                int etherealEssence = CE.getEtherealEssence();
+                context.getSource().sendSuccess(() ->
+                        config.getMessage("ce.admin.get",playerName,cultivationRealm,stageRank,etherealEssence), false);
+            });
             return 1;
         }
+        context.getSource().sendFailure(config.getMessage("ce.admin.empty",playerName));
         return 0;
     }
 
     private int setCultivationRealm(CommandContext<CommandSourceStack> context){
         String playerName = StringArgumentType.getString(context, "player");
         UUID playerUUID = CelestialEssenceSavedData.getUUID(playerName);
-        String oldLevel=StringArgumentType.getString(context, "old");
-        String newLevel=StringArgumentType.getString(context, "new");
-        //修改逻辑暂时省略
-        context.getSource().sendSuccess(() -> Component.literal("管理test2"), false);
-        return 1;
+        int newLevel=Integer.valueOf(StringArgumentType.getString(context, "new"));
+        if(playerUUID!=null){
+            ServerPlayer player = context.getSource().getServer().getPlayerList().getPlayer(playerUUID);
+            Optional<CelestialEssence> optionalCE =
+                    Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
+            optionalCE.ifPresent(CE -> {
+                CE.setCultivationRealm(newLevel);
+            });
+            context.getSource().sendSuccess(() ->
+                    config.getMessage("ce.admin.change",playerName,"CultivationRealm"), false);
+            return 1;
+        }
+        return 0;
     }
 
     private int setStageRank(CommandContext<CommandSourceStack> context){
         String playerName = StringArgumentType.getString(context, "player");
         UUID playerUUID = CelestialEssenceSavedData.getUUID(playerName);
-        String oldLevel=StringArgumentType.getString(context, "old");
-        String newLevel=StringArgumentType.getString(context, "new");
-        //修改逻辑暂时省略
-        context.getSource().sendSuccess(() -> Component.literal("管理test3"), false);
-        return 1;
+        int newLevel=Integer.valueOf(StringArgumentType.getString(context, "new"));
+        if(playerUUID!=null){
+            ServerPlayer player = context.getSource().getServer().getPlayerList().getPlayer(playerUUID);
+            Optional<CelestialEssence> optionalCE =
+                    Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
+            optionalCE.ifPresent(CE -> {
+                CE.setStageRank(newLevel);
+            });
+            context.getSource().sendSuccess(() ->
+                    config.getMessage("ce.admin.change",playerName,"StageRank"), false);
+            return 1;
+        }
+        return 0;
     }
 
     private int setEtherealEssence(CommandContext<CommandSourceStack> context){
         String playerName = StringArgumentType.getString(context, "player");
         UUID playerUUID = CelestialEssenceSavedData.getUUID(playerName);
-        String oldLevel=StringArgumentType.getString(context, "old");
-        String newLevel=StringArgumentType.getString(context, "new");
-        //修改逻辑暂时省略
-        context.getSource().sendSuccess(() -> Component.literal("管理test4"), false);
-        return 1;
+        int newLevel=Integer.valueOf(StringArgumentType.getString(context, "new"));
+        if(playerUUID!=null){
+            ServerPlayer player = context.getSource().getServer().getPlayerList().getPlayer(playerUUID);
+            Optional<CelestialEssence> optionalCE =
+                    Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
+            optionalCE.ifPresent(CE -> {
+                CE.setEtherealEssence(newLevel);
+            });
+            context.getSource().sendSuccess(() ->
+                    config.getMessage("ce.admin.change",playerName,"EtherealEssence"), false);
+            return 1;
+        }
+        return 0;
     }
 
     private int addEtherealEssence(CommandContext<CommandSourceStack> context){
         String playerName = StringArgumentType.getString(context, "player");
         UUID playerUUID = CelestialEssenceSavedData.getUUID(playerName);
-        int num = Integer.parseInt(StringArgumentType.getString(context, "num"));
-        //修改逻辑暂时省略
-        context.getSource().sendSuccess(() -> Component.literal("管理test5"), false);
-        return 1;
+        int newLevel=Integer.valueOf(StringArgumentType.getString(context, "num"));
+        if(playerUUID!=null){
+            ServerPlayer player = context.getSource().getServer().getPlayerList().getPlayer(playerUUID);
+            Optional<CelestialEssence> optionalCE =
+                    Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
+            optionalCE.ifPresent(CE -> {
+                CE.addEtherealEssence(newLevel);
+            });
+            context.getSource().sendSuccess(() ->
+                    config.getMessage("ce.admin.add",playerName), false);
+            return 1;
+        }
+        return 0;
     }
 }

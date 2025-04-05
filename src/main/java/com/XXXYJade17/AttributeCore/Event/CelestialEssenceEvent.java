@@ -41,9 +41,9 @@ public class CelestialEssenceEvent {
                         Optional.ofNullable(player.getCapability(CapabilityHandler.SHACKLE_HANDLER));
                 optionalShackle.ifPresent(shackle ->{
                     if(!shackle.hasShackle()){
-                        Optional<CelestialEssence> optionalPlayerXp =
+                        Optional<CelestialEssence> optionalCE =
                                 Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
-                        optionalPlayerXp.ifPresent(CE -> {
+                        optionalCE.ifPresent(CE -> {
                             int tickCounter = tickCounters.getOrDefault(player, 0)+1;
                             if (tickCounter >= TICKS_PER_MINUTE) {
                                 tickCounters.put(player, 0);
@@ -69,9 +69,9 @@ public class CelestialEssenceEvent {
         if (!event.getLevel().isClientSide()) {
             if (event.getEntity() instanceof ServerPlayer player) {
                 CelestialEssenceSavedData.addUUID(player);
-                Optional<CelestialEssence> optionalPlayerXp =
+                Optional<CelestialEssence> optionalCE =
                         Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
-                optionalPlayerXp.ifPresent(CE -> {
+                optionalCE.ifPresent(CE -> {
                     CelestialEssenceSavedData savedData = CelestialEssenceSavedData.get((ServerLevel) event.getLevel());
                     CompoundTag data=new CompoundTag();
                     savedData.getPlayerData(player.getUUID()).saveData(data);
@@ -87,9 +87,9 @@ public class CelestialEssenceEvent {
     public static void onPlayerLeave(EntityLeaveLevelEvent event) {
         if (!event.getLevel().isClientSide()) {
             if (event.getEntity() instanceof ServerPlayer player) {
-                Optional<CelestialEssence> optionalPlayerXp =
+                Optional<CelestialEssence> optionalCE =
                         Optional.ofNullable(player.getCapability(CapabilityHandler.CELESTIAL_ESSENCE_HANDLER));
-                optionalPlayerXp.ifPresent(CE -> {
+                optionalCE.ifPresent(CE -> {
                     CelestialEssenceSavedData savedData = CelestialEssenceSavedData.get((ServerLevel) event.getLevel());
                     savedData.savePlayerData(player.getUUID(), CE);
                 });

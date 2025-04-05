@@ -9,6 +9,7 @@ public interface ICelestialEssence {
     void setStageRank(int stageRank);
     int getEtherealEssence();
     void addEtherealEssence(int etherealEssence);
+    void setEtherealEssence(int etherealEssence);
     boolean hasShackle();
     boolean isReachShackle();
     void breakShackle();
