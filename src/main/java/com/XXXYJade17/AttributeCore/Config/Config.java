@@ -238,6 +238,14 @@ public class Config {
         return false;
     }
 
+    public int getInitialBreakRate(int cultivationRealm, int stageRank){
+        return InitialBreakRate.get(cultivationRealm).get(stageRank);
+    }
+
+    public int getBreakRatePerAdd(int cultivationRealm, int stageRank){
+        return BreakRatePerAdd.get(cultivationRealm).get(stageRank);
+    }
+
     public String getLogMessage(String key) {
         return switch (key) {
             case "config.failed" -> "AttributeCore配置文件加载失败:";

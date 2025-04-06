@@ -2,6 +2,7 @@ package com.XXXYJade17.AttributeCore.Command;
 
 import com.XXXYJade17.AttributeCore.Capability.CelestialEssence.CelestialEssence;
 import com.XXXYJade17.AttributeCore.Capability.Handler.CapabilityHandler;
+import com.XXXYJade17.AttributeCore.Capability.Shackle.Shackle;
 import com.XXXYJade17.AttributeCore.Config.Config;
 import com.XXXYJade17.AttributeCore.Data.Client.CelestialEssenceData;
 import com.XXXYJade17.AttributeCore.Data.Server.CelestialEssenceSavedData;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 
 import javax.swing.*;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 public class AdminCommand {
@@ -35,6 +37,7 @@ public class AdminCommand {
 
     public void registerCommand(CommandDispatcher<CommandSourceStack> dispatcher){
         this.AdminCelestialEssenceCommand(dispatcher);
+        this.AdminShackleCommand(dispatcher);
     }
 
     private void AdminCelestialEssenceCommand(CommandDispatcher<CommandSourceStack> dispatcher){
@@ -213,6 +216,41 @@ public class AdminCommand {
             context.getSource().sendSuccess(() ->
                     config.getMessage("ce.admin.add",playerName), false);
             return 1;
+        }
+        return 0;
+    }
+
+    private void AdminShackleCommand(CommandDispatcher<CommandSourceStack> dispatcher){
+        LiteralArgumentBuilder<CommandSourceStack> Administrator =
+                Commands.literal("Shackle").requires(source -> source.hasPermission(2));
+
+        Administrator
+                .then(Commands.argument("player",StringArgumentType.word())
+                        .then(Commands.literal("break")
+                                .executes(this::breakShackle)));
+
+        dispatcher.register(Administrator);
+    }
+
+    private int breakShackle(CommandContext<CommandSourceStack> context){
+        String playerName = StringArgumentType.getString(context, "player");
+        UUID playerUUID = CelestialEssenceSavedData.getUUID(playerName);
+        if(playerUUID!=null){
+            ServerPlayer player = context.getSource().getServer().getPlayerList().getPlayer(playerUUID);
+            Optional<Shackle> optionalShackle =
+                    Optional.ofNullable(player.getCapability(CapabilityHandler.SHACKLE_HANDLER));
+            optionalShackle.ifPresent(shackle -> {
+                if(shackle.hasShackle()){
+                    if(shackle.breakShackle()){
+                        context.getSource().sendSuccess(() ->
+                                config.getMessage("shackle.break.success"), false);
+                    }else{
+                        context.getSource().sendFailure(config.getMessage("shackle.break.failed"));
+                    }
+                }else{
+                    context.getSource().sendFailure(config.getMessage("shackle.break.none"));
+                }
+            });
         }
         return 0;
     }

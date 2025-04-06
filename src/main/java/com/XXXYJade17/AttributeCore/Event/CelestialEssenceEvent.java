@@ -51,6 +51,9 @@ public class CelestialEssenceEvent {
                                 player.sendSystemMessage(config.getMessage("online.reward",1));
                                 if(CE.isReachShackle()){
                                     shackle.setShackle(true);
+                                    shackle.setBreakRate(config.getInitialBreakRate(CE.getCultivationRealm(), CE.getStageRank()));
+                                    shackle.setRatePerAdd(config.getBreakRatePerAdd(CE.getCultivationRealm(), CE.getStageRank()));
+                                    CE.breakShackle();
                                 }
                                 PacketDistributor.PLAYER.with(player)
                                         .send(new CelestialEssenceData(CE.getCultivationRealm(), CE.getStageRank(), CE.getEtherealEssence()));
